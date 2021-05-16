@@ -1,0 +1,16 @@
+2458313.500000000 = A.D. 2018-Jul-14 00:00:00.0000 TDB 
+ X =-6.573688011324302E-01 Y = 7.092600127919823E-01 Z = 3.074357326035481E-01
+ EC= 3.442331151631375E-01 QR= 6.930144815626641E-01 IN= 2.515524947650488E+01
+ OM= 2.362379850063705E+02 W = 2.555046043599768E+02 Tp=  2458158.720843224786
+ N = 9.072246285920804E-01 MA= 1.404194630193922E+02 TA= 1.589559281040760E+02
+ A = 1.056800057439722E+00 AD= 1.420585633316781E+00 PR= 3.968146241341387E+02
+17 42 21.12 +31 52 26.7
+
+FORMAT (this section is NOT READ)
+Julian date, time
+X, Y, Z of initial r vector (from sun to asteroid) (in AU)
+4 lines for initial orbital elements; these are stored in a dictionary
+Final RA and dec of asteroid (This ephemeris is used to check answers on the day you are trying to generate the ephemeris. 
+
+Apparent states setting:
+ X =-6.572933185672107E-01 Y = 7.093186603595993E-01 Z = 3.074616740112658E-01
