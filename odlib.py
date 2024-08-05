@@ -10,13 +10,13 @@ import ephem
 
 # CONSTANTS
 gauss = 58.132358929894
-k = 0.01720209895 #Gaussian gravitational constant
-G = 6.67428 * 10 ** -11 # Gravitational constant
+k = 0.01720209895  # Gaussian gravitational constant
+G = 6.67428 * 10 ** -11  # Gravitational constant
 Msun = 1.98892 * 10 ** 30
 Mearth = 5.9722 * 10 ** 24
 mu = G * (Msun + Mearth)
-cAU = 173.144632674240 #speed of light in au/(mean solar)day 
-eps = math.radians(23.4366) #Earth's obliquity
+cAU = 173.144632674240  # speed of light in au/(mean solar)day 
+eps = math.radians(23.4366)  # Earth's obliquity
 
 # Returns an angle in the correct quadrant given its sine and cosine value (RADIANS)
 def findQuadrant(sine, cosine):
@@ -108,46 +108,6 @@ def dectosex(n, hours):
             result = "+" + result
     return result
 
-'''
-# Function to get x, y, z, vx, vy, vz of specified time in data file formatted as:
-# X     Y     Z
-# VX    VY    VZ
-# LT    RG    RR
-# date: yyyy-Mon-dd
-# time: hh:mm:ss.ssss
-def getData (filename, date, time):
-    # First read in the input line by line
-    inputfile = open(filename)
-    text = inputfile.readlines()
-
-    # Initialize variables
-    x, y, z = 0, 0, 0
-    vx, vy, vz = 0, 0, 0
-
-    i = -1 # keep track of which type of line we're on; title, (x,y,z), (vx,vy,vz) etc
-    correctday = False # if we're on the correct day this is true
-    # In this loop, we use the direct indeces because they're the same for each line
-    for line in text:
-        # Check if we're on the correct day
-        if date in line and time in line:
-            i = 0
-            correctday = True
-        # read in positions
-        if i == 1:
-            x = float(line[4:26].strip())
-            y = float(line[30:52].strip())
-            z = float(line[56:78].strip())
-        # read in velocities
-        if i == 2:
-            # read/convert velocities to gaussian units
-            vx = float(line[4:26].strip()) / k
-            vy = float(line[30:52].strip()) / k
-            vz = float(line[56:78].strip()) / k
-            break
-        if correctday:
-            i += 1
-    return [x,y,z,vx,vy,vz]
-'''
 
 # Function to get data dictionary (ddict) of specified time in data file formatted as:
 # X     Y     Z
@@ -227,15 +187,6 @@ def getElements(filename, date, time):
             i += 1
     return edict
 
-'''
-# Calculate angular momentum h with array of values which represent position, velocity
-# arr = [x,y,z,vx,vy,vz]
-def getangularmomentum (arr):
-    # find angular momentum through cross product of position and velocity
-    position = np.array([arr[0], arr[1], arr[2]])
-    velocity = np.array([arr[3], arr[4], arr[5]])
-    return np.cross(position, velocity)
-'''
 
 # r = position (x, y, z)
 # v = velocity (vx, vy, vz)
@@ -291,25 +242,6 @@ def trueanomaly(r, v, degrees = False):
 # omega
 # r = position vector [x, y, z]
 # i = inclination (RADIANS)
-'''
-def argperihelion(r, v, degrees = False):
-    # Find U, the angular distance from the ascending node to the asteroid
-    h = getangularmomentum(r, v)
-    omega = lonascending(r, v)
-    i = inclination(r, v)
-    cosineU = ( r[0] * math.cos(omega) + r[1] * math.sin(omega) )/ np.linalg.norm(r)
-    sineU = r[2] / ( np.linalg.norm(r) * math.sin(i) ) 
-    U = findQuadrant(sineU, cosineU)
-
-    # Find v, the true anomaly (distance from perihelion to asteroid)
-    v = trueanomaly(r, v)
-
-    w = U - v
-    w %= 2 * math.pi
-    if degrees:
-        return w * 180 / math.pi
-    return w
-'''
 def argperihelion(r, rdot, degrees = False):
     Omega = lonascending(r, rdot, degrees = False)
     i = inclination(r, rdot, degrees = False)
@@ -336,7 +268,6 @@ def argperihelion(r, rdot, degrees = False):
     if(degrees):
         return w * 180 / pi
     return w
-
 
 
 # ma ; mean anomaly is how much of the orbit the asteroid has passed through
@@ -410,11 +341,6 @@ def meananomalyjd(r, v, jdold, jdnew, k2 = 1, degrees = False): #, wrap180 = Fal
     M = meananomaly(r, v)
     n = meanmotion(r, v, k1 = k2)
     Mnew = M + n * (jdnew - jdold)
-
-    #Mnew %= 2 * pi
-    #if wrap180:
-    #    if Mnew > pi:
-    #        Mnew = Mnew - 2 * pi
 
     if degrees:
         Mnew = Mnew * 180 / pi
@@ -491,13 +417,13 @@ def timeofperiapsisjd(r, v, JD):
     return T
 
 # Determine the initial value of r2 using the scalar equation of lagrange (SEL)
-#taus = [tau1,tau3,tau]
-#sun2 = [Sunx,Suny,Sunz]
-#rhohat2 = [rhohatx,rhohat2y,rhohat2z]
-#Ds = [D0,D21,D22,D23]
+# taus = [tau1,tau3,tau]
+# sun2 = [Sunx,Suny,Sunz]
+# rhohat2 = [rhohatx,rhohat2y,rhohat2z]
+# Ds = [D0,D21,D22,D23]
 def SEL(taus, Sun2, rhohat2, Ds):
-    roots = [0.,0.,0.] #for up to three real, positive roots 
-    rhos = [0.,0.,0.] #range values for each real, positive root
+    roots = [0.,0.,0.] # for up to three real, positive roots 
+    rhos = [0.,0.,0.] # range values for each real, positive root
 
     t1 = taus[0]
     t3 = taus[1]
@@ -539,12 +465,6 @@ def SEL(taus, Sun2, rhohat2, Ds):
     rhos.sort()
     return(roots,rhos) # returns roots for SEL, and rhos (momentum)
 
-'''
-# function that's used in eccentricanomaly()
-def f(E, M, e):
-    return E - e*sin(E) - M
-    #return E - e * sin(E) - M
-'''
 
 # GENERIC NEWTON RALPHSON METHOD
 # init = initial value
@@ -648,7 +568,6 @@ def ephemeris(edict, startdate, enddate, juliandate = True, degree = True): # In
     i = radians(edict["i"]) # inclination
     w = radians(edict["w"]) # argument of perihelion
     Omega = radians(edict["Omega"]) # longitude of ascending node
-    #n = radians(edict["n"]) # mean motion (MAY NEED TO RECALCULATE IN TERMS OF k and a!!!)
     n = (k**2/a**3) ** 0.5 # mean motion
     X = edict["x"] # sun vector
     Y = edict["y"]
@@ -691,8 +610,6 @@ def ephemeris(edict, startdate, enddate, juliandate = True, degree = True): # In
     return ra, dec
 
 
-
-
 # Function used in eccentricanomaly2() in newton ralphson process
 def f1(x, r2, r2dot, tau):
     a = semimajoraxis(r2, r2dot)
@@ -715,7 +632,6 @@ def fprime1(x, r2, r2dot, tau):
 
 # use newton's method to find dE
 # newton's method: xnew = x - f(x)/f'(x)
-#def eccentricanomaly2(E, M, e, tol, r2, r2dot):
 def eccentricanomaly2(r2, r2dot, tau, tol):
     a = semimajoraxis(r2, r2dot)
     e = eccentricity(r2, r2dot)
@@ -997,7 +913,6 @@ def ephemerispyephem(edict, lon1, lat1, elev1, datetime):
     a = 1.904732734778862E+00
     jd = edict["jd"]
     '''
-    #print(a, e, i, w, Omega, E, M, n, lastper, P, jd)
     
     dateformat = datetime[5:7] + "/" + datetime[8:10] + "." + str(round(jd - int(jd), 5))[2:] + "/" + datetime[0:4]
     # make an xephem-style database entry for your asteroid 
@@ -1006,30 +921,9 @@ def ephemerispyephem(edict, lon1, lat1, elev1, datetime):
         e, M, dateformat, 2000,"",""]
     alist = [str(element) for element in alist]
     line = ",".join(alist)
-    #line = "2003GE42, e, 27.8543085, 165.6469288, 101.353156, 2.63408,,\
-    #    0.375418379, 8.4377868, 07/05.29722/2020, 2000,,"
-    #line = "C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0"
 
     #create the asteroid
     asteroid = ephem.readdb(line)
     #compute its position for the observer 
     asteroid.compute(obs)
-    #print the asteroid's astrometric ra & dec 
-    #print ("Ra, dec", asteroid.a_ra,asteroid.a_dec)
     return sextodec(str(asteroid.a_ra), hours = True), sextodec(str(asteroid.a_dec), hours = False)
-    #print("RA, DEC", asteroid._ra, ateroid._dec)
-    #return asteroid.a_ra, asteroid.a_dec
-    #print ("Ra, dec", asteroid.a_ra,asteroid.a_dec)
-
-    #Field1 = name
-    #Field2 = e (for Elliptical body)
-    #Field3 = inclination, degrees
-    #Field4 = ascending node, degrees
-    #Field5 = argument of perihelion, degrees
-    #Field6 = semi-major axis, au
-    #Field7 = blank (note the extra comma - this is for mean motion # n and it's optional)
-    #Field8 = eccentricity
-    #Field9 = mean anomaly, degrees
-    #Field10 = epoch for mean anomaly (MM/DD.ddd/YYYY - turn the UTC # time into a decimal day)
-    #Field11 = 2000.0 (the equinox)
-    #Followed by some optional fields - all the commas in the sample #below are important!

@@ -74,17 +74,13 @@ def dectosex(n, hours):
             result = "+" + result
     return result
 
-
 #---------------------------------------------------------------------------------------------
 
 # Read in the user's input using command line
 # (x, y) centroid of UNKNOWN OBJECT
 filename = input("test input file = ")
 testposition = input("test position (x,y) = ")
-#filename = "LSPRtestinput1.txt"
-#testposition = "(484.35,382.62)"
-#filename = "LSPRtestinput2.txt"
-#testposition = "(1403.6,1585.9)"
+
 xn = float( testposition[1:testposition.index(",")] ) # x coord of new object
 yn = float( testposition[testposition.index(",") + 1:len(testposition)-1] ) # y coord of new object
 
@@ -134,7 +130,6 @@ for i in range(N):
     Sdecx += DEC[i] * x[i]
     Sdecy += DEC[i] * y[i]
 
-#print(Sx, Sy, Sx2, Sy2, Sxy, Sra, Srax, Sray, Sdec, Sdecx, Sdecy)
 # Define 3x3 matrix from equation and invert it
 m = np.array([[N,Sx,Sy], [Sx,Sx2,Sxy],[Sy,Sxy,Sy2]])
 m = np.linalg.inv(m)
@@ -180,7 +175,6 @@ a21 = math.degrees(a21)
 a22 = math.degrees(a22)
 
 
-
 # Print out results with formatting
 print("***************")
 print("plate constants")
@@ -202,11 +196,5 @@ print("(x,y)=",testposition)
 print("*********************************")
 print(" RA: ", ra)
 print("Dec:", dec)
-
-
-
-
-
-
 
 print("\n\n")

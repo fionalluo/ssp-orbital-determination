@@ -18,12 +18,12 @@ from matplotlib.ticker import PercentFormatter
 
 # CONSTANTS
 gauss = 58.132358929894
-k = 0.01720209895 #Gaussian gravitational constant
-G = 6.67428 * 10 ** -11 # Gravitational constant
+k = 0.01720209895  # Gaussian gravitational constant
+G = 6.67428 * 10 ** -11  # Gravitational constant
 Msun = 1.98892 * 10 ** 30
 Mearth = 5.9722 * 10 ** 24
-cAU = 173.144632674240 #speed of light in au/(mean solar)day 
-eps = math.radians(23.4366) #Earth's obliquity
+cAU = 173.144632674240  # speed of light in au/(mean solar)day 
+eps = math.radians(23.4366)  # Earth's obliquity
 
 def main():
     # READ INPUT FILE
@@ -38,7 +38,6 @@ def main():
 
     # Monte Carlo: iterate through many cases and reset the ra and dec
     avg_elements, std_elements, sdom_elements = getuncertainties(odicts, corrfiles, edict, iteration = 1000, printresults = True)
-    #print("Mnew =", round(Mnew, 6), "degrees at", newdate, newtime, "UTC")
 
 
 # Input: odicts (list of dictionaries for each observation's JD, Ra, Dec, X, Y, Z)
@@ -86,11 +85,7 @@ def getorbitalelements(odicts, exdicts = []):
             viableroots.append(i)
     # If there are multiple positive real roots, ask the user which to use
     if (len(viableroots) > 1):
-        n = len(viableroots) # THIS IS HARDCODED FOR NOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        '''for i in range(len(viableroots)):
-            print(roots[viableroots[i]], end = " ")
-            print("RHOS", rhos[viableroots[i]], end = " ")
-        print()'''
+        n = len(viableroots)
         r2 = roots[viableroots[n-1]]
         rho = rhos[viableroots[n-1]]
     # If there's only one root, use that one
@@ -98,7 +93,6 @@ def getorbitalelements(odicts, exdicts = []):
         r2 = roots[viableroots[0]]
         rho = rhos[viableroots[0]]
     else:
-        #print("No SEL Solution")
         return {}
     
     # Get initial estimates for f and g in the second order
@@ -130,13 +124,12 @@ def getorbitalelements(odicts, exdicts = []):
     r3 = rho3 - R3
     r2dot = d1*r1 + d3*r3
 
-    # MAIN ITERATION LOOP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # MAIN ITERATION LOOP
     diff = 100
     fnew, gnew = 0, 0
     iteration = 1
     lighttraveltime = 0
     while diff > 10 ** -12:
-    #for i in range (1):
         # Account for light travel time
         # Calculate new times = toriginal - momentum magnitude / speed of light
         t1n = t1 - rho1m / cAU
@@ -183,13 +176,6 @@ def getorbitalelements(odicts, exdicts = []):
         if iteration > 200:
             break
 
-    # Check for any ERROR CASES and return EMPTY ARRAY if so
-    #if math.isnan(r2[0]) or math.isnan(r2dot[0]):
-    #    return {}
-    # Check for if the vectors are UNUSUALLY SMALL!! ASK ABOUT THIS TOMORROW???????????????????????????????
-    #if any(abs(n) < 10**-3 for n in r2) or any(abs(n) < 10**-3 for n in r2dot):
-    #    return {}
-
     #I", r2, r2dot)
     # Convert r2 and r2dot from equatorial to ECLIPTIC coordinates
     m1 = np.array([[1,0,0],[0,cos(eps),-1*sin(eps)],[0,sin(eps),cos(eps)]])
@@ -204,21 +190,13 @@ def getorbitalelements(odicts, exdicts = []):
     
     # CALCULATE ORBITAL ELEMENTS
     edict = od.orbitalelements(r2ec, r2dotec, jdcorrected)
-    #Mnew = od.meananomalyjd(r2ec, r2dotec, jdcorrected, jdnew, k2 = k, degrees = True) # Mean anomaly at July 25, 2020 16:00 UT
     return edict
-
-
-
 
 
 # Reads/prints the input file, stores it in an array of dictionaries for each observation
 # Asks the user which observations they would like to use
 # Returns list of the chosen observations
 def readallinput(filename):
-    # Print the input file for the user to see
-    #print("Input File:")
-    #od.printfile(filename) 
-    
     # read in the input file and store it in an array of dictionaries
     odictsraw = od.readodfile(filename)
 
@@ -228,10 +206,7 @@ def readallinput(filename):
     exdicts = []
     
     if len(odictsraw) > 3:
-        
         print("\nThe input file contains {0} observations.".format(len(odictsraw)))
-        #s = input("Which would you like to select? ex: 1 2 3: ")
-        #chosen = tuple(map(int, s.split(' ')))
         
         chosen = 1, 2, 3
         chosen = sorted(chosen)
@@ -266,7 +241,6 @@ def getuncertainties(odicts, corrfiles, edict, iteration = 1000, printresults = 
 
     iterations = 0 # The number iteration we are on in the loop
     for i in range(iteration):
-        #print(i)
         odictsnew = [i.copy() for i in odicts] # The dictionary with modified ra and dec values
         # New dictionary of observations; change the 6 ras and decs randomly
         odictsnew[0]["ra"] = np.random.normal(odicts[0]["ra"], ura1)
@@ -304,23 +278,7 @@ def getuncertainties(odicts, corrfiles, edict, iteration = 1000, printresults = 
     # PRINT average, std, sdoms
     if printresults:
         od.printuncertainties(avg_elements, std_elements, sdom_elements)
-    '''
-    # print HISTOGRAMS
-    #fig = plt.figure() #initialize histogram
-    orbitalelements = ["a", "e", "i", "Omega", "omega", "M"]
-    titles = ["Semimajor Axis (AU)", "Eccentricity", "Inclination (degrees)", \
-        "Longitude of Ascending Node (degrees)", "Argument of Perihelion (degrees)", "Mean Anomaly (degrees)"]
-    # Print histograms in subplots
-    fig, axes = plt.subplots(nrows=2, ncols=3)
-    ax0, ax1, ax2, ax3, ax4, ax5 = axes.flatten()
-    ax = [ax0, ax1, ax2, ax3, ax4, ax5]
-    for i in range(len(elementnames)): #for each element
-        element = elementnames[i]
-        ax[i].hist(flux_edicts[element], bins = 40)
-        ax[i].xlabel(titles[i])
-        ax[i].ylabel("Number of Cases")
-    plt.show()
-    '''
+
     return avg_elements, std_elements, sdom_elements
 
 
